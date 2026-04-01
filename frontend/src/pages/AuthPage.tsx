@@ -9,7 +9,7 @@ export default function AuthPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { setToken } = useContext(AuthContext);
+    const { setAuth } = useContext(AuthContext);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,7 +37,7 @@ export default function AuthPage() {
                 throw new Error((data.error || 'Authentication failed') + detailMsg);
             }
 
-            setToken(data.token);
+            setAuth(data.token, data.user);
         } catch (err: any) {
             setError(err.message);
         } finally {
