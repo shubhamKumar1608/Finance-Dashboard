@@ -1,0 +1,75 @@
+### Finance Dashboard API Tests
+
+# --------------------------------------------------------
+# 1. Healthcheck
+# --------------------------------------------------------
+GET http://localhost:3000/health
+
+###
+
+# --------------------------------------------------------
+# 2. Authentication (Register an Admin)
+# --------------------------------------------------------
+# @name registerAdmin
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@finance.com",
+  "password": "securepassword123",
+  "name": "Admin User",
+  "role": "ADMIN"
+}
+
+###
+
+# --------------------------------------------------------
+# 3. Authentication (Login)
+# Extract the token from the response for the next steps!
+# --------------------------------------------------------
+# @name login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@finance.com",
+  "password": "securepassword123"
+}
+
+###
+
+# --------------------------------------------------------
+# Set your token here after logging in
+# --------------------------------------------------------
+@token = REPLACE_WITH_YOUR_COPIED_TOKEN_HERE
+
+# --------------------------------------------------------
+# 4. Create a Financial Record (Admin only)
+# --------------------------------------------------------
+POST http://localhost:3000/api/v1/records
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "amount": 2500,
+  "type": "INCOME",
+  "category": "Salary",
+  "date": "2026-04-01T10:00:00Z",
+  "notes": "April Salary"
+}
+
+###
+
+# --------------------------------------------------------
+# 5. Get Dashboard Summary (Available to all authenticated roles)
+# --------------------------------------------------------
+GET http://localhost:3000/api/v1/dashboard/summary
+Authorization: Bearer {{token}}
+
+###
+
+# --------------------------------------------------------
+# 6. List Records
+# --------------------------------------------------------
+GET http://localhost:3000/api/v1/records
+Authorization: Bearer {{token}}

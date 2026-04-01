@@ -1,0 +1,36 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note: Prisma does not support native enums in SQLite.
+// We use String and will handle enum validation in the application logic (Zod).
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("VIEWER") // 'ADMIN', 'ANALYST', 'VIEWER'
+  status       String   @default("ACTIVE") // 'ACTIVE', 'INACTIVE'
+  records      Record[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Record {
+  id         String   @id @default(uuid())
+  amount     Float
+  type       String   // 'INCOME', 'EXPENSE'
+  category   String
+  date       DateTime
+  notes      String?
+  createdBy  String
+  user       User     @relation(fields: [createdBy], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
