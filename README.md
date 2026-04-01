@@ -1,6 +1,6 @@
 # Finance Dashboard 🚀
 
-A professional, full-stack Finance Dashboard application built with **Node.js, Express, TypeScript, Prisma (PostgreSQL)**, and a premium **Glassmorphic React frontend**.
+A professional, full-stack Finance Dashboard application built with **Node.js, Express 5, TypeScript, Prisma (PostgreSQL)**, and a premium **Glassmorphic React frontend**.
 
 ## ✨ Features
 - **Role-Based Access Control (RBAC)**: Distinct permissions for `ADMIN`, `ANALYST`, and `VIEWER`.
@@ -13,64 +13,82 @@ A professional, full-stack Finance Dashboard application built with **Node.js, E
 | Tier | Technology |
 |---|---|
 | **Backend** | Node.js, Express 5, TypeScript, Zod, JWT |
-| **Database** | PostgreSQL, Prisma ORM |
+| **Database** | PostgreSQL (Production), SQLite (Testing), Prisma ORM |
 | **Frontend** | React 18, Vite, Lucide icons, Vanilla CSS |
 | **Testing** | Jest, Supertest |
-| **Deployment** | Render (Infrastructure as Code via `render.yaml`) |
+| **Monorepo** | npm Workspaces |
 
 ---
 
-## 🧠 Technical Decisions and Trade-offs
+## 🏗️ Setup and Installation
 
-### 1. **The Choice of "Glassmorphism" over TailwindCSS**
-**Decision**: I opted for a custom Vanilla CSS system rather than utility frameworks like Tailwind or component libraries like MUI.
-- **Pros**: Zero runtime overhead, 100% design flexibility, and a truly unique, premium "Apple-like" aesthetic that feels bespoke rather than "out-of-the-box."
-- **Cons**: Development time per component is higher.
-- **Trade-off**: High visual quality and performance were prioritized over development speed.
+### 1. Prerequisites
+- Node.js (v18+)
+- npm (v9+)
+- A PostgreSQL database (or use local SQLite for dev)
 
-### 2. **Express 5 & Path-to-Regexp**
-**Decision**: I used the newest **Express v5** beta for native `async/await` error handling.
-- **Challenge**: Express 5 removed string-based wildcard patterns (e.g., `*`).
-- **Fix**: I implemented native Regex objects `/(.*)/` for the SPA catch-all route.
-- **Trade-off**: Used an experimental branch of Express to gain cleaner error-handling code at the cost of slightly more strict routing syntax.
+### 2. Environment Configuration
+Create a `.env` file in the root directory:
+```env
+PORT=3000
+DATABASE_URL="postgresql://user:password@localhost:5432/finance_db"
+JWT_SECRET="your_extremely_secure_random_key"
+JWT_EXPIRES_IN="1d"
+```
 
-### 3. **Consolidated Analytical API vs. Multiple Micro-Fetches**
-**Decision**: Created a `getFullSummary` endpoint to fetch all dashboard data in one request.
-- **Pros**: Drastically reduces network latency and waterfall effects in the frontend.
-- **Cons**: Slightly higher database load per request.
-- **Trade-off**: Better UX and "snappy" dashboard loading was preferred over ultra-granular API partitioning.
-
-### 4. **Prisma & No-Enum Trade-off (Postgres Migration)**
-**Decision**: We originally used SQLite for local prototyping. When moving to PostgreSQL, I maintained string-based status and roles instead of native DB enums.
-- **Pros**: Keeps the schema compatible across different DB types and makes migrations between Postgres providers easier.
-- **Cons**: Relies on application-level (Zod/TS) validation rather than database-level constraints.
-- **Trade-off**: Portability and flexibility won over strict DB-native validation.
-
-### 5. **Workspaces & Monorepo Structure**
-**Decision**: Implemented `npm workspaces` late in the deployment.
-- **Pros**: Cut Render build times by ~40% by sharing the dependency tree and parallelizing installs.
-- **Cons**: Initial complexity in pathing for the TypeScript compiler (fixed by isolated `tsconfig.json`).
-- **Trade-off**: Added slightly more configuration overhead to achieve significantly faster CI/CD cycles.
-
----
-
-## 🚀 Getting Started
-
-### 1. Backend Setup
+### 3. Local Installation
+From the project root:
 ```bash
+# Install dependencies for both Backend & Frontend (via Workspaces)
 npm install
+
+# Push the schema to your database and generate Prisma Client
 npm run db:push
+
+# Start the full ecosystem (Backend on 3000, Frontend on 5173)
+# To run backend only:
 npm run dev
+# To run frontend only:
+cd frontend && npm run dev
 ```
 
-### 2. Frontend Setup
-```bash
-cd frontend
-npm install
-npm run dev
-```
+---
 
-## 🧪 Testing
+## 🚫 Current Limitations
+
+### 1. **Authentication Storage**
+Current implementation stores the JWT in `localStorage`. While convenient, it is susceptible to XSS. A production-ready environment would typically utilize **HTTP-Only Cookies** for safer token persistence.
+
+### 2. **State Management Scalability**
+We are using the native **React Context API** for global auth state. As the app grows (e.g., global filtering, multi-currency toggles), we would likely transition to **Zustand** or **Redux Toolkit** to prevent unnecessary re-renders.
+
+### 3. **Static Data Visualization**
+The dashboard charts are custom-built with pure CSS for zero bundle overhead. However, they lack interactivity (tooltips, dynamic zooming) found in heavy libraries like **Recharts** or **D3**.
+
+---
+
+## 🧬 Technical Decisions and Trade-offs
+
+- **Glassmorphism**: Prioritized high-end custom "Apple-style" aesthetics over the speed of Tailwind utility classes.
+- **Express 5 Beta**: Chose the newer beta branch to gain native `async/await` error handling, simplifying the middleware stack.
+- **Consolidated API**: All analytical data is fetched in one `/full-summary` request to eliminate loading waterfalls and improve "perceived performance."
+- **NPM Workspaces**: Implemented a monorepo structure once the project matured to cut build and installation times in half.
+
+---
+
+## 📈 Areas for Future Improvement
+
+- **[ ] Interactive Charts**: Integrate `Recharts` for interactive tooltips and zooming.
+- **[ ] Live Notifications**: Implementation of a toast system (e.g., `react-hot-toast`) for real-time feedback (e.g., successful/failed payments).
+- **[ ] Advanced Filtering**: Allow users to filter the entire dashboard by custom date ranges (Weekly, Quarterly, Yearly).
+- **[ ] Export Capabilities**: Add a one-click "Export to CSV/PDF" button for financial reports.
+- **[ ] MFA**: Add Multi-Factor Authentication (OTP via email/SMS) for the Admin role.
+
+---
+
+## 🧪 Testing Integration
+Run the suite of integration and unit tests:
 ```bash
 npm test
 ```
+The application maintains a healthy test coverage for auth boundaries and DB logic.
