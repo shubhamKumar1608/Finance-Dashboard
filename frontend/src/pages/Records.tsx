@@ -10,7 +10,7 @@ export default function Records() {
     const [category, setCategory] = useState('');
 
     const fetchRecords = () => {
-        fetch('http://localhost:3000/api/v1/records', {
+        fetch('/api/v1/records', {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => res.json())
@@ -24,7 +24,7 @@ export default function Records() {
 
     const addRecord = async (e: React.FormEvent) => {
         e.preventDefault();
-        await fetch('http://localhost:3000/api/v1/records', {
+        await fetch('/api/v1/records', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ amount: parseFloat(amount), type, category, date: new Date().toISOString() })
@@ -34,7 +34,7 @@ export default function Records() {
     };
 
     const deleteRecord = async (id: string) => {
-        await fetch(`http://localhost:3000/api/v1/records/${id}`, {
+        await fetch(`/api/v1/records/${id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` }
         });

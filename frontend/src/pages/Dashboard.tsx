@@ -7,7 +7,7 @@ export default function Dashboard() {
     const [summary, setSummary] = useState({ totalIncome: 0, totalExpense: 0, netBalance: 0 });
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/v1/dashboard/summary', {
+        fetch('/api/v1/dashboard/summary', {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => res.json())
