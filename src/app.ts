@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import { errorHandler } from './middlewares/errorHandler';
@@ -23,6 +24,17 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 
 // Healthcheck
 app.get('/health', (req, res) => res.status(200).json({ status: 'OK' }));
+
+// Serve frontend static files
+const frontendPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendPath));
+
+app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API route not found' });
+    }
+    res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 // Global error handler
 app.use(errorHandler);

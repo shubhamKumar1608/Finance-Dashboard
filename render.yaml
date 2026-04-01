@@ -1,0 +1,22 @@
+databases:
+  - name: finance-db
+    databaseName: financedb
+    user: financeuser
+    plan: free
+
+services:
+  - type: web
+    name: finance-dashboard
+    env: node
+    plan: free
+    buildCommand: "npm install && npx prisma generate && cd frontend && npm install && npm run build"
+    startCommand: "npx ts-node src/server.ts"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: finance-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
